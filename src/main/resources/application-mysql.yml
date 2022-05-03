@@ -1,7 +1,7 @@
 spring:
-  config:
-    activate:
-      on-profile: mysql
+#  config:
+#    activate:
+#      on-profile: mysql
   datasource:
     url: jdbc:mysql://localhost:3306/spring_batch?serverTimezone=UTC&characterEncoding=UTF-8
     username: root

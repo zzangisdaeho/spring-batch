@@ -1,0 +1,4 @@
+spring:
+  batch:
+    job:
+      enabled: false; # job 자동실행 막는다. default = true
