@@ -34,7 +34,7 @@ public class HelloJobConfiguration {
                 .build();
     }
 
-    @Bean
+//    @Bean
     public Step helloStep2() {
         return stepBuilderFactory.get("hello-Step-2")
                 .tasklet(new Tasklet() {
@@ -61,10 +61,12 @@ public class HelloJobConfiguration {
                 .build();
     }
 
-    @Bean
+//    @Bean
     public Step helloStep1() {
         return stepBuilderFactory.get("hello-Step-1")
                 .tasklet((contribution, chunkContext) -> {
+
+                    Thread.sleep(3000);
 
                     System.out.println("==============================================");
                     System.out.println(" >> Hello Spring Batch!! - Step1 is executing");

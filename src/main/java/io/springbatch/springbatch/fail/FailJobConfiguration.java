@@ -37,7 +37,7 @@ public class FailJobConfiguration {
      * step 단위로 재실행된다. 이미 성공한 step은 재실행되지 않는다. step execution table status 참고
      * 중간 step이 실패하면 다음 step은 실행해보지도 않는다
      */
-    @Bean
+//    @Bean
     public Step failStep2() {
         return stepBuilderFactory.get("fail-Step-2")
                 .tasklet(new Tasklet() {
@@ -65,7 +65,7 @@ public class FailJobConfiguration {
                 .build();
     }
 
-    @Bean
+//    @Bean
     public Step compStep1() {
         return stepBuilderFactory.get("comp-Step-1")
                 .tasklet((contribution, chunkContext) -> {
