@@ -1,7 +1,8 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatch.job_incrementor;
 
-import org.springframework.batch.core.*;
-import org.springframework.stereotype.Component;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersIncrementer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

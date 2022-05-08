@@ -1,4 +1,5 @@
 spring:
   batch:
     job:
-      enabled: false; # job 자동실행 막는다. default = true
+      enabled: false # job 자동실행 막는다. default = true
+      names: ${job.name:NONE} # --job.name=JOBNAME1,JOBNAME2 name=... date= ...

@@ -42,7 +42,7 @@ public class JobLauncherDrive {
 
         try {
             //JobLauncher로 가져오는 SimpleJobLauncher는 jdk dynamic으로 생성된 proxy이다.
-            //고로 자식타입으로 downcasting 시도시 castexception이 일어난다.
+            //고로 다른 자식타입으로 downcasting 시도시 castexception이 일어난다.
             //configuer클래스에서 실제 launcher클래스의 구현체인 SimpleJobLauncher를 가지고 있기 때문에
             //configuer를 통해 실제 구현체로 접근하여 setting해준다.
             SimpleJobLauncher jobLauncher = (SimpleJobLauncher) basicBatchConfigurer.getJobLauncher();

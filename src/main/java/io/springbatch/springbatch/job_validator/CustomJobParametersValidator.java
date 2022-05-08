@@ -1,10 +1,8 @@
-package io.springbatch.springbatchlecture;
+package io.springbatch.springbatch.job_validator;
 
-import org.springframework.batch.core.*;
-import org.springframework.stereotype.Component;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersInvalidException;
+import org.springframework.batch.core.JobParametersValidator;
 
 public class CustomJobParametersValidator implements JobParametersValidator {
 
