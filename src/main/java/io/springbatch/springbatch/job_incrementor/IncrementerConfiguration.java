@@ -18,7 +18,7 @@ public class IncrementerConfiguration {
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job batchJob() {
+    public Job incrementerJob() {
         return this.jobBuilderFactory.get("batchJob")
 //                .incrementer(new RunIdIncrementer())
                 .incrementer(new CustomJobParametersIncrementer())
@@ -28,7 +28,6 @@ public class IncrementerConfiguration {
                 .build();
     }
 
-    @Bean
     public Step step1() {
         return stepBuilderFactory.get("step1")
                 .tasklet((contribution, chunkContext) -> {
@@ -37,7 +36,6 @@ public class IncrementerConfiguration {
                 })
                 .build();
     }
-    @Bean
     public Step step2() {
         return stepBuilderFactory.get("step2")
                 .tasklet((contribution, chunkContext) -> {
@@ -46,7 +44,6 @@ public class IncrementerConfiguration {
                 })
                 .build();
     }
-    @Bean
     public Step step3() {
         return stepBuilderFactory.get("step3")
                 .tasklet((contribution, chunkContext) -> {

@@ -17,7 +17,7 @@ public class ValidatorConfiguration {
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job batchJob() {
+    public Job validatorJob() {
         return this.jobBuilderFactory.get("batchJob")
                 .validator(new CustomJobParametersValidator())
 //                .validator(new DefaultJobParametersValidator(new String[]{"name"},new String[]{"year"}))
@@ -27,7 +27,6 @@ public class ValidatorConfiguration {
                 .build();
     }
 
-    @Bean
     public Step step1() {
         return stepBuilderFactory.get("step1")
                 .tasklet((contribution, chunkContext) -> {
@@ -36,7 +35,6 @@ public class ValidatorConfiguration {
                 })
                 .build();
     }
-    @Bean
     public Step step2() {
         return stepBuilderFactory.get("step2")
                 .tasklet((contribution, chunkContext) -> {
@@ -45,7 +43,6 @@ public class ValidatorConfiguration {
                 })
                 .build();
     }
-    @Bean
     public Step step3() {
         return stepBuilderFactory.get("step3")
                 .tasklet((contribution, chunkContext) -> {
