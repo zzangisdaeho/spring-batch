@@ -19,20 +19,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("mysql")
-class FlowJobConfigurationTest {
+class SimpleFlowConfigurationTest {
 
-    // job 실행기
     @Autowired
     private JobLauncher jobLauncher;
 
     @Autowired
-    private Job flowJob;
+    private Job simpleFlowJob;
 
     @Test
     void run() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("date", "20210512")
+//                .addDate("date", new Date())
                 .toJobParameters();
-        jobLauncher.run(flowJob, jobParameters);
+        jobLauncher.run(simpleFlowJob, jobParameters);
     }
 }
