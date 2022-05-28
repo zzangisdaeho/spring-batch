@@ -1,5 +1,0 @@
-POST http://localhost:8080/launch/async/1
-
-### Send POST request with json body
-POST http://localhost:8080/launch/sync/1
-
