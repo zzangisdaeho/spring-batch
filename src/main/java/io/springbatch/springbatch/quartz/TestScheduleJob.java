@@ -27,9 +27,10 @@ public class TestScheduleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
-        log.info("TestScheduleJob.executeInternal");
 
+        Integer testNum = (Integer)context.getJobDetail().getJobDataMap().get("testNum");
 
+        log.info("TestScheduleJob.executeInternal" + testNum);
 
 //        JobParameters jobParameters = new JobParametersBuilder()
 //                .addDate("date", new Date())
