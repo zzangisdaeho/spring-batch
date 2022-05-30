@@ -22,7 +22,7 @@ public class QuartzRegister {
 
         Map<String, Integer> param2 = new HashMap<>();
         param2.put("testNum", 2);
-        quartzService.addCronJob(TestScheduleJob.class, "testJob1", "test", "Quartz 잡 테스트1", param1, "0/3 * * * * ?");
-        quartzService.addCronJob(TestScheduleJob.class, "testJob2", "test", "Quartz 잡 테스트2", param2, "0/5 * * * * ?");
+//        quartzService.addCronJob(TestScheduleJob.class, "testJob1", "test", "Quartz 잡 테스트1", param1, "0/3 * * * * ?");
+//        quartzService.addCronJob(TestScheduleJob.class, "testJob2", "test", "Quartz 잡 테스트2", param2, "0/5 * * * * ?");
     }
 }
