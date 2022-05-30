@@ -11,7 +11,7 @@ spring:
   quartz:
     job-store-type: jdbc #Database Mode
     jdbc:
-      initialize-schema: ALWAYS #Do initialize table structure
+      initialize-schema: NEVER #Do initialize table structure
     properties:
       org:
         quartz:

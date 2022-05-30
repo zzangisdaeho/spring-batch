@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.Scheduler;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -23,10 +24,10 @@ public class TestScheduleJob extends QuartzJobBean {
 
     private final JobLauncher jobLauncher;
 
+
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-
 
         Integer testNum = (Integer)context.getJobDetail().getJobDataMap().get("testNum");
 
@@ -36,5 +37,7 @@ public class TestScheduleJob extends QuartzJobBean {
 //                .addDate("date", new Date())
 //                .toJobParameters();
 //        jobLauncher.run(apiJob, jobParameters);
+
+
     }
 }
