@@ -2,6 +2,7 @@ package io.springbatch.springbatch.batch.service;
 
 import io.springbatch.springbatch.api.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -9,9 +10,9 @@ import org.springframework.stereotype.Service;
 public class FailOverService {
 
     private final CompanyRepository companyRepository;
-    private final TestService testService;
+    private final VacationBatchService testService;
 
-    public void failOver(long companySeq) throws Exception {
+    public void failOver(long companySeq) {
         testService.update(companyRepository.findById(companySeq).get());
     }
 

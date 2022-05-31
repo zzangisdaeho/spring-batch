@@ -25,9 +25,9 @@ public class BaseData {
 
     private final CompanyRepository companyRepository;
 
-    private final JobLauncher jobLauncher;
-
-    private final Job companyJob;
+//    private final JobLauncher jobLauncher;
+//
+//    private final Job companyJob;
 
     @PostConstruct
     @Transactional

@@ -17,11 +17,11 @@ import java.util.Date;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class BatchJobScheduler extends QuartzJobBean {
+public class PaymentJobSchedule extends QuartzJobBean {
 
     private final JobLauncher jobLauncher;
 
-    private final Job companyJob;
+    private final Job paymentJob;
 
     @SneakyThrows
     @Override
@@ -30,7 +30,7 @@ public class BatchJobScheduler extends QuartzJobBean {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addDate("date", new Date())
                 .toJobParameters();
-        jobLauncher.run(companyJob, jobParameters);
+        jobLauncher.run(paymentJob, jobParameters);
 
     }
 }

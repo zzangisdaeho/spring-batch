@@ -12,7 +12,7 @@ import java.util.Set;
 @Component
 @StepScope
 @Slf4j
-public class CustomSkipListener implements SkipListener<CompanyEntity, CompanyEntity> {
+public class CompanySkipListener implements SkipListener<CompanyEntity, CompanyEntity> {
 
     @Value("#{jobExecutionContext['failCompanySet']}")
     private Set<Long> failCompanySet;
