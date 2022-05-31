@@ -6,9 +6,11 @@ import org.quartz.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,7 +71,7 @@ public class QuartzService {
     // 초  분  시   일   월  요일  년도(생략가능)
     private Trigger buildCronJobTrigger(String scheduleExp) {
         return TriggerBuilder.newTrigger()
-                .withSchedule(CronScheduleBuilder.cronSchedule(scheduleExp))
+                .withSchedule(CronScheduleBuilder.cronSchedule(scheduleExp).inTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC)))
                 .build();
     }
 

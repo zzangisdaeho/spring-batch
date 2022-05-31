@@ -28,7 +28,7 @@ spring:
             isClustered: true #Turn on Clustering
           threadPool: #Connection Pool
             class: org.quartz.simpl.SimpleThreadPool
-            threadCount: 10
+            threadCount: 3
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
 logging:
@@ -40,3 +40,10 @@ logging:
       hibernate:
         SQL: debug
         type.descriptor.sql.BasicBinder: trace
+
+docwave:
+  batch:
+    group: docwave-v3
+    jobs:
+      rest: rest
+      payment: payment

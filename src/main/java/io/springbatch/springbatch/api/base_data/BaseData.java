@@ -42,15 +42,13 @@ public class BaseData {
             companyRepository.save(company);
         }
 
+//
+//        JobParameters jobParameters = new JobParametersBuilder()
+//                .addDate("date", new Date())
+//                .toJobParameters();
+//
+//        jobLauncher.run(companyJob, jobParameters);
 
-
-        Thread.sleep(3000);
-
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addDate("date", new Date())
-                .toJobParameters();
-
-        jobLauncher.run(companyJob, jobParameters);
     }
 
 }

@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 @RequiredArgsConstructor
 public class TestService {
 
-//    @Transactional
+    @Transactional(transactionManager = "apiTransactionManager")
     public void update(CompanyEntity companyEntity){
         if(companyEntity.getCompanySeq() % 5 == 0){
             throw new IllegalStateException("5번째 컴페니는 통과할 수 없다!");

@@ -11,7 +11,7 @@ public class FailOverService {
     private final CompanyRepository companyRepository;
     private final TestService testService;
 
-    public void failOver(long companySeq){
+    public void failOver(long companySeq) throws Exception {
         testService.update(companyRepository.findById(companySeq).get());
     }
 

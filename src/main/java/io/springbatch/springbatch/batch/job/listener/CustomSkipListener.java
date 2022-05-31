@@ -1,6 +1,7 @@
 package io.springbatch.springbatch.batch.job.listener;
 
 import io.springbatch.springbatch.api.entity.CompanyEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,10 +11,11 @@ import java.util.Set;
 
 @Component
 @StepScope
+@Slf4j
 public class CustomSkipListener implements SkipListener<CompanyEntity, CompanyEntity> {
 
     @Value("#{jobExecutionContext['failCompanySet']}")
-    private Set failCompanySet;
+    private Set<Long> failCompanySet;
 
     @Override
     public void onSkipInRead(Throwable t) {

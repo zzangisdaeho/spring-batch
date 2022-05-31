@@ -18,10 +18,15 @@ import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,7 +45,6 @@ public class BatchJobConfig {
     @Bean
     public Job companyJob() {
         return jobBuilderFactory.get("companyJob")
-                .incrementer(new RunIdIncrementer())
                 .start(companyStep())
                 .listener(new CompanyJobListener())
                 .build();
@@ -54,14 +58,23 @@ public class BatchJobConfig {
                 .processor(itemProcessorTest)
                 .writer(CompanyItemWriter())
                 .faultTolerant()
-                .retry(RuntimeException.class)
+                .retry(TransientDataAccessException.class)
                 .retryLimit(3)
 //                .backOffPolicy(getFixedBackOffPolicy())
                 .skip(RuntimeException.class)
                 .skipLimit(Integer.MAX_VALUE)
                 .listener(skipListener)
                 .transactionManager(apiTransactionManager)
+//                .taskExecutor(taskExecutor())
                 .build();
+    }
+
+    private TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setMaxPoolSize(10);
+        executor.setThreadNamePrefix("async-thread-");
+        return executor;
     }
 
     private FixedBackOffPolicy getFixedBackOffPolicy() {
@@ -82,8 +95,18 @@ public class BatchJobConfig {
 
     @Bean
     public ItemWriter<? super CompanyEntity> CompanyItemWriter() {
-        return new JpaItemWriterBuilder<CompanyEntity>()
-                .entityManagerFactory(emf)
-                .build();
+
+        return new ItemWriter<CompanyEntity>() {
+            @Override
+            public void write(List<? extends CompanyEntity> items) throws Exception {
+                log.info("=============================Writer Result========================");
+                items.forEach(company -> log.info("{} : {} : {}",company.getCompanySeq(), company.getCompanyName(), company.getUpdateTime()));
+                log.info("=============================Writer Result========================");
+            }
+        };
+
+//        return new JpaItemWriterBuilder<CompanyEntity>()
+//                .entityManagerFactory(emf)
+//                .build();
     }
 }
