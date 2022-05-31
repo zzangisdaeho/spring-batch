@@ -69,9 +69,10 @@ public class BatchJobConfig {
                 .build();
     }
 
-    private TaskExecutor taskExecutor() {
+    @Bean
+    public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(8);
+        executor.setCorePoolSize(4);
         executor.setMaxPoolSize(10);
         executor.setThreadNamePrefix("async-thread-");
         return executor;
@@ -89,7 +90,7 @@ public class BatchJobConfig {
                 .name("companyReader")
                 .entityManagerFactory(emf)
                 .pageSize(1)
-                .queryString("select c from CompanyEntity c")
+                .queryString("select c from CompanyEntity c join fetch c.members order by c.companySeq")
                 .build();
     }
 
