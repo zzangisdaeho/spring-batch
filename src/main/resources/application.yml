@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
@@ -28,7 +28,7 @@ spring:
             isClustered: true #Turn on Clustering
           threadPool: #Connection Pool
             class: org.quartz.simpl.SimpleThreadPool
-            threadCount: 3
+            threadCount: 8
             threadPriority: 5
             threadsInheritContextClassLoaderOfInitializingThread: true
 logging:

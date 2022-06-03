@@ -19,6 +19,7 @@ public class CompanySkipListener implements SkipListener<CompanyEntity, CompanyE
 
     @Override
     public void onSkipInRead(Throwable t) {
+        t.printStackTrace();
         System.out.println(">> onSkipInRead : "+ t.getMessage());
     }
 

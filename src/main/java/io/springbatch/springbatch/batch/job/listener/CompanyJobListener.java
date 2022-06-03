@@ -14,6 +14,7 @@ public class CompanyJobListener implements JobExecutionListener {
     @Override
     public void beforeJob(JobExecution jobExecution) {
         log.info("***************** Job start *****************");
+        log.info("************ Job name : {} **********", jobExecution.getJobInstance().getJobName());
         jobExecution.getExecutionContext().put("failCompanySet", new HashSet<Long>());
     }
     @Override
@@ -21,6 +22,7 @@ public class CompanyJobListener implements JobExecutionListener {
         long startTime = Objects.requireNonNull(jobExecution.getStartTime()).getTime();
         long endTime = Objects.requireNonNull(jobExecution.getEndTime()).getTime();
         log.info("***************** Job end *****************");
+        log.info("************ Job name : {} **********", jobExecution.getJobInstance().getJobName());
         log.info("fail company List = {}", jobExecution.getExecutionContext().get("failCompanySet"));
         log.info("수행시간 -> {}", (endTime - startTime));
     }

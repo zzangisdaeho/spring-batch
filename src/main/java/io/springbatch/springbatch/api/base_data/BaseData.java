@@ -29,26 +29,26 @@ public class BaseData {
 //
 //    private final Job companyJob;
 
-    @PostConstruct
-    @Transactional
-    public void addData() throws InterruptedException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
-
-        for (int i = 0; i < 100; i++) {
-            CompanyEntity company = CompanyEntity.builder().companyName("company" + i).build();
-            for (int j = 0; j < 10; j++) {
-                MemberEntity member = MemberEntity.builder().memberName("name" + i*10+j).build();
-                company.addMember(member);
-            }
-            companyRepository.save(company);
-        }
-
+//    @PostConstruct
+//    @Transactional
+//    public void addData() throws InterruptedException, JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
 //
-//        JobParameters jobParameters = new JobParametersBuilder()
-//                .addDate("date", new Date())
-//                .toJobParameters();
+//        for (int i = 0; i < 100; i++) {
+//            CompanyEntity company = CompanyEntity.builder().companyName("company" + i).build();
+//            for (int j = 0; j < 10; j++) {
+//                MemberEntity member = MemberEntity.builder().memberName("name" + i*10+j).build();
+//                company.addMember(member);
+//            }
+//            companyRepository.save(company);
+//        }
 //
-//        jobLauncher.run(companyJob, jobParameters);
-
-    }
+////
+////        JobParameters jobParameters = new JobParametersBuilder()
+////                .addDate("date", new Date())
+////                .toJobParameters();
+////
+////        jobLauncher.run(companyJob, jobParameters);
+//
+//    }
 
 }

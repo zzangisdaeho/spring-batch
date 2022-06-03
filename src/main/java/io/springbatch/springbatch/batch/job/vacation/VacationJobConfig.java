@@ -3,12 +3,14 @@ package io.springbatch.springbatch.batch.job.vacation;
 import io.springbatch.springbatch.api.entity.CompanyEntity;
 import io.springbatch.springbatch.batch.job.listener.CompanyJobListener;
 import io.springbatch.springbatch.batch.job.listener.CompanySkipListener;
+import io.springbatch.springbatch.batch.service.VacationBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
@@ -30,12 +32,10 @@ public class VacationJobConfig {
 
     private final PlatformTransactionManager apiTransactionManager;
 
-    private final ItemReader<CompanyEntity> companyItemReader;
-    private final ItemWriter<CompanyEntity> companyItemWriter;
-
-    private final VacationProcessor itemProcessorTest;
-
     private final CompanySkipListener skipListener;
+    private final EntityManagerFactory emf;
+
+    private final VacationBatchService vacationBatchService;
 
     @Bean
     public Job vacationJob() {
@@ -49,9 +49,9 @@ public class VacationJobConfig {
 
         return stepBuilderFactory.get("vacationStep")
                 .<CompanyEntity, CompanyEntity>chunk(1)
-                .reader(companyItemReader)
-                .processor(itemProcessorTest)
-                .writer(companyItemWriter)
+                .reader(vacationReader())
+                .processor(vacationProcessor())
+                .writer(vacationWriter())
                 .faultTolerant()
                 .retry(TransientDataAccessException.class)
                 .retryLimit(3)
@@ -68,5 +68,35 @@ public class VacationJobConfig {
         FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
         backOffPolicy.setBackOffPeriod(2000); //지정한 시간만큼 대기후 재시도 한다.
         return backOffPolicy;
+    }
+
+//    @Bean
+    private ItemReader<CompanyEntity> vacationReader() {
+        return new JpaPagingItemReaderBuilder<CompanyEntity>()
+                .name("companyReader")
+                .entityManagerFactory(emf)
+                .pageSize(1)
+                .queryString("select c from CompanyEntity c order by c.companySeq")
+                .build();
+    }
+
+//    @Bean
+    private ItemProcessor<CompanyEntity, CompanyEntity> vacationProcessor(){
+        return item -> {
+            Thread.sleep(1000);
+            log.info("company Seq : {}", item.getCompanySeq());
+            vacationBatchService.update(item);
+            return item;
+        };
+    }
+
+//    @Bean
+    private ItemWriter<CompanyEntity> vacationWriter() {
+
+        return items -> {
+            log.info("=============================Writer Result========================");
+            items.forEach(company -> log.info("{} : {} : {}",company.getCompanySeq(), company.getCompanyName(), company.getUpdateTime()));
+            log.info("=============================Writer Result========================");
+        };
     }
 }
