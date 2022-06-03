@@ -35,6 +35,7 @@ public class ApiJpaConfiguration {
             EntityManagerFactoryBuilder builder) {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
+//        properties.put("hibernate.physical_naming_strategy", CustomJpaPhysicalNamingStrategy.class.getName());
         return builder
                 .dataSource(dataSource)
                 //Entity scan package

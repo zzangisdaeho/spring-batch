@@ -59,7 +59,7 @@ public class PaymentJobConfig {
                 .skip(RuntimeException.class)
                 .skipLimit(Integer.MAX_VALUE)
                 .listener(skipListener)
-                .transactionManager(apiTransactionManager)
+//                .transactionManager(apiTransactionManager)
                 .build();
     }
 
@@ -70,8 +70,8 @@ public class PaymentJobConfig {
         return backOffPolicy;
     }
 
-//    @Bean
-    private ItemReader<CompanyEntity> paymentReader() {
+    @Bean
+    public ItemReader<CompanyEntity> paymentReader() {
         return new JpaPagingItemReaderBuilder<CompanyEntity>()
                 .name("companyReader")
                 .entityManagerFactory(emf)
@@ -80,20 +80,20 @@ public class PaymentJobConfig {
                 .build();
     }
 
-//    @Bean
-    private ItemProcessor<CompanyEntity, CompanyEntity> paymentProcessor(){
+    @Bean
+    public ItemProcessor<CompanyEntity, CompanyEntity> paymentProcessor(){
         return item -> {
             log.info("company Seq : {}", item.getCompanySeq());
 
-            Thread.sleep(1000);
+//            Thread.sleep(1000);
             paymentBatchService.update(item);
 
             return item;
         };
     }
 
-//    @Bean
-    private ItemWriter<CompanyEntity> paymentWriter() {
+    @Bean
+    public ItemWriter<CompanyEntity> paymentWriter() {
 
         return items -> {
             log.info("=============================Writer Result========================");

@@ -13,14 +13,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PaymentBatchService {
 
-    @Transactional(transactionManager = "apiTransactionManager")
-    public void update(CompanyEntity companyEntity){
+//    @Transactional(transactionManager = "apiTransactionManager")
+    public void update(CompanyEntity companyEntity) {
 
-        if(companyEntity.getCompanySeq() % 4 == 0){
+        if (companyEntity.getCompanySeq() % 4 == 0) {
             throw new IllegalStateException("4번째 컴페니는 통과할 수 없다!");
         }
 
         companyEntity.setUpdateTime(ZonedDateTime.now());
-        companyEntity.getMembers().forEach(member -> member.setUpdateTime(ZonedDateTime.now()));
+        companyEntity.getMembers().forEach(member -> {
+            member.setMemberName(member.getMemberName() + "_payment");
+            member.setUpdateTime(ZonedDateTime.now());
+        });
     }
 }

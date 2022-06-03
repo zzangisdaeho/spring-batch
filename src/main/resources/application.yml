@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -9,10 +9,12 @@ spring:
     job:
       enabled: false # job 자동실행 막는다. default = true
       names: ${job.name:NONE} # --job.name=JOBNAME1,JOBNAME2 name=... date= ...
+    jdbc:
+      initialize-schema: ALWAYS
   quartz:
     job-store-type: jdbc #Database Mode
     jdbc:
-      initialize-schema: NEVER #Do initialize table structure
+      initialize-schema: ALWAYS #Do initialize table structure
     properties:
       org:
         quartz:

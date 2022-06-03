@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 @RequiredArgsConstructor
 public class VacationBatchService {
 
-    @Transactional(transactionManager = "apiTransactionManager")
+//    @Transactional(transactionManager = "apiTransactionManager")
     public void update(CompanyEntity companyEntity){
 
         if(companyEntity.getCompanySeq() % 5 == 0){
@@ -20,6 +20,10 @@ public class VacationBatchService {
         }
 
         companyEntity.setUpdateTime(ZonedDateTime.now());
+        companyEntity.getMembers().forEach(member -> {
+            member.setMemberName(member.getMemberName() + "_vacation");
+            member.setUpdateTime(ZonedDateTime.now());
+        });
         companyEntity.getMembers().forEach(member -> member.setUpdateTime(ZonedDateTime.now()));
     }
 }

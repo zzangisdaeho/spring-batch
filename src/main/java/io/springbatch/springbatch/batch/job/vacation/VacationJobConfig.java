@@ -59,7 +59,7 @@ public class VacationJobConfig {
                 .skip(RuntimeException.class)
                 .skipLimit(Integer.MAX_VALUE)
                 .listener(skipListener)
-                .transactionManager(apiTransactionManager)
+//                .transactionManager(apiTransactionManager)
                 .build();
     }
 
@@ -70,8 +70,8 @@ public class VacationJobConfig {
         return backOffPolicy;
     }
 
-//    @Bean
-    private ItemReader<CompanyEntity> vacationReader() {
+    @Bean
+    public ItemReader<CompanyEntity> vacationReader() {
         return new JpaPagingItemReaderBuilder<CompanyEntity>()
                 .name("companyReader")
                 .entityManagerFactory(emf)
@@ -80,18 +80,18 @@ public class VacationJobConfig {
                 .build();
     }
 
-//    @Bean
-    private ItemProcessor<CompanyEntity, CompanyEntity> vacationProcessor(){
+    @Bean
+    public ItemProcessor<CompanyEntity, CompanyEntity> vacationProcessor(){
         return item -> {
-            Thread.sleep(1000);
+//            Thread.sleep(1000);
             log.info("company Seq : {}", item.getCompanySeq());
             vacationBatchService.update(item);
             return item;
         };
     }
 
-//    @Bean
-    private ItemWriter<CompanyEntity> vacationWriter() {
+    @Bean
+    public ItemWriter<CompanyEntity> vacationWriter() {
 
         return items -> {
             log.info("=============================Writer Result========================");

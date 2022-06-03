@@ -18,6 +18,7 @@ public class MemberEntity {
     @GeneratedValue
     private Long memberSeq;
 
+    @Column(length = 8)
     private String memberName;
 
     private ZonedDateTime updateTime;
