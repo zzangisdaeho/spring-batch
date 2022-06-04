@@ -3,7 +3,6 @@ package io.springbatch.springbatch.batch.job.vacation;
 import io.springbatch.springbatch.api.entity.CompanyEntity;
 import io.springbatch.springbatch.batch.job.listener.CompanyJobListener;
 import io.springbatch.springbatch.batch.job.listener.CompanySkipListener;
-import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import io.springbatch.springbatch.batch.service.VacationBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +56,7 @@ public class VacationJobConfig {
     public Step vacationStep() throws Exception {
 
         return stepBuilderFactory.get("vacationStep")
-                .<CompanyDto, CompanyEntity>chunk(1)
+                .<Long, CompanyEntity>chunk(1)
                 .reader(vacationReader())
                 .processor(vacationProcessor())
                 .writer(vacationWriter())
@@ -91,13 +89,13 @@ public class VacationJobConfig {
 //    }
 
     @Bean
-    public JdbcPagingItemReader<CompanyDto> vacationReader() throws Exception {
+    public JdbcPagingItemReader<Long> vacationReader() throws Exception {
 
-        return new JdbcPagingItemReaderBuilder<CompanyDto>()
-                .name("testItemReader")
+        return new JdbcPagingItemReaderBuilder<Long>()
+                .name("vacationItemReader")
                 .pageSize(1)
                 .dataSource(apiDataSource)
-                .rowMapper(new BeanPropertyRowMapper<>(CompanyDto.class))
+                .rowMapper(new SingleColumnRowMapper<>())
                 .queryProvider(vacationQueryProvider())
                 .build();
     }
@@ -108,7 +106,7 @@ public class VacationJobConfig {
         queryProvider.setDataSource(apiDataSource);
 //        queryProvider.setSelectClause("company_seq, company_name");
 //        queryProvider.setFromClause("from company_entity");
-        queryProvider.setSelectClause("companySeq, companyName");
+        queryProvider.setSelectClause("companySeq");
         queryProvider.setFromClause("from CompanyEntity");
 
         Map<String, Order> sortKeys = new HashMap<>(1);
@@ -120,10 +118,10 @@ public class VacationJobConfig {
     }
 
     @Bean
-    public ItemProcessor<CompanyDto, CompanyEntity> vacationProcessor(){
+    public ItemProcessor<Long, CompanyEntity> vacationProcessor(){
         return item -> {
 //            Thread.sleep(1000);
-            log.info("company Seq : {}", item.getCompanySeq());
+            log.info("company Seq : {}", item);
             return vacationBatchService.update(item);
         };
     }
@@ -134,7 +132,6 @@ public class VacationJobConfig {
         return items -> {
             log.info("=============================Writer Result========================");
             items.forEach(company -> log.info("{} : {} : {}",company.getCompanySeq(), company.getCompanyName(), company.getUpdateTime()));
-            log.info("=============================Writer Result========================");
         };
     }
 }

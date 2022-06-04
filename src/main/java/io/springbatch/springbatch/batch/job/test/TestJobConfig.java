@@ -1,14 +1,12 @@
 package io.springbatch.springbatch.batch.job.test;
 
 import io.springbatch.springbatch.api.entity.CompanyEntity;
-import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import io.springbatch.springbatch.batch.job.listener.CompanyJobListener;
 import io.springbatch.springbatch.batch.job.listener.CompanySkipListener;
 import io.springbatch.springbatch.batch.service.TestBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -24,7 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 
 import javax.sql.DataSource;
@@ -58,7 +56,7 @@ public class TestJobConfig {
     public Step testStep() throws Exception {
 
         return stepBuilderFactory.get("testStep")
-                .<CompanyDto, CompanyEntity>chunk(1)
+                .<Long, CompanyEntity>chunk(1)
                 .reader(testReader())
                 .processor(testProcessor())
                 .writer(testWriter())
@@ -81,13 +79,13 @@ public class TestJobConfig {
     }
 
     @Bean
-    public JdbcPagingItemReader<CompanyDto> testReader() throws Exception {
+    public JdbcPagingItemReader<Long> testReader() throws Exception {
 
-        return new JdbcPagingItemReaderBuilder<CompanyDto>()
+        return new JdbcPagingItemReaderBuilder<Long>()
                 .name("testItemReader")
                 .pageSize(1)
                 .dataSource(apiDataSource)
-                .rowMapper(new BeanPropertyRowMapper<>(CompanyDto.class))
+                .rowMapper(new SingleColumnRowMapper<>())
                 .queryProvider(testQueryProvider())
                 .build();
     }
@@ -98,7 +96,7 @@ public class TestJobConfig {
         queryProvider.setDataSource(apiDataSource);
 //        queryProvider.setSelectClause("company_seq, company_name");
 //        queryProvider.setFromClause("from company_entity");
-        queryProvider.setSelectClause("companySeq, companyName");
+        queryProvider.setSelectClause("companySeq");
         queryProvider.setFromClause("from CompanyEntity");
 
         Map<String, Order> sortKeys = new HashMap<>(1);
@@ -110,9 +108,9 @@ public class TestJobConfig {
     }
 
     @Bean
-    public ItemProcessor<CompanyDto, CompanyEntity> testProcessor(){
+    public ItemProcessor<Long, CompanyEntity> testProcessor(){
         return item -> {
-            log.info("company Seq : {}", item.getCompanySeq());
+            log.info("company Seq : {}", item);
 
             return testBatchService.update(item);
         };

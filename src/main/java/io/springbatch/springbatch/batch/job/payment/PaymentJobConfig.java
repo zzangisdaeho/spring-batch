@@ -3,7 +3,6 @@ package io.springbatch.springbatch.batch.job.payment;
 import io.springbatch.springbatch.api.entity.CompanyEntity;
 import io.springbatch.springbatch.batch.job.listener.CompanyJobListener;
 import io.springbatch.springbatch.batch.job.listener.CompanySkipListener;
-import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import io.springbatch.springbatch.batch.service.PaymentBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 
 import javax.sql.DataSource;
@@ -57,7 +56,7 @@ public class PaymentJobConfig {
     public Step paymentStep() throws Exception {
 
         return stepBuilderFactory.get("paymentStep")
-                .<CompanyDto, CompanyEntity>chunk(1)
+                .<Long, CompanyEntity>chunk(1)
                 .reader(paymentReader())
                 .processor(paymentProcessor())
                 .writer(paymentWriter())
@@ -89,13 +88,13 @@ public class PaymentJobConfig {
 //                .build();
 //    }
 @Bean
-public JdbcPagingItemReader<CompanyDto> paymentReader() throws Exception {
+public JdbcPagingItemReader<Long> paymentReader() throws Exception {
 
-    return new JdbcPagingItemReaderBuilder<CompanyDto>()
+    return new JdbcPagingItemReaderBuilder<Long>()
             .name("testItemReader")
             .pageSize(1)
             .dataSource(apiDataSource)
-            .rowMapper(new BeanPropertyRowMapper<>(CompanyDto.class))
+            .rowMapper(new SingleColumnRowMapper<>())
             .queryProvider(paymentQueryProvider())
             .build();
 }
@@ -106,7 +105,7 @@ public JdbcPagingItemReader<CompanyDto> paymentReader() throws Exception {
         queryProvider.setDataSource(apiDataSource);
 //        queryProvider.setSelectClause("company_seq, company_name");
 //        queryProvider.setFromClause("from company_entity");
-        queryProvider.setSelectClause("companySeq, companyName");
+        queryProvider.setSelectClause("companySeq");
         queryProvider.setFromClause("from CompanyEntity");
 
         Map<String, Order> sortKeys = new HashMap<>(1);
@@ -119,9 +118,9 @@ public JdbcPagingItemReader<CompanyDto> paymentReader() throws Exception {
 
 
     @Bean
-    public ItemProcessor<CompanyDto, CompanyEntity> paymentProcessor(){
+    public ItemProcessor<Long, CompanyEntity> paymentProcessor(){
         return item -> {
-            log.info("company Seq : {}", item.getCompanySeq());
+            log.info("company Seq : {}", item);
 
 //            Thread.sleep(1000);
             return paymentBatchService.update(item);
@@ -134,7 +133,6 @@ public JdbcPagingItemReader<CompanyDto> paymentReader() throws Exception {
         return items -> {
             log.info("=============================Writer Result========================");
             items.forEach(company -> log.info("{} : {} : {}",company.getCompanySeq(), company.getCompanyName(), company.getUpdateTime()));
-            log.info("=============================Writer Result========================");
         };
     }
 }
