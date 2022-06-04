@@ -1,6 +1,7 @@
 package io.springbatch.springbatch.batch.job.listener;
 
 import io.springbatch.springbatch.api.entity.CompanyEntity;
+import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -12,7 +13,7 @@ import java.util.Set;
 @Component
 @StepScope
 @Slf4j
-public class CompanySkipListener implements SkipListener<CompanyEntity, CompanyEntity> {
+public class CompanySkipListener implements SkipListener<CompanyDto, CompanyEntity> {
 
     @Value("#{jobExecutionContext['failCompanySet']}")
     private Set<Long> failCompanySet;
@@ -23,6 +24,7 @@ public class CompanySkipListener implements SkipListener<CompanyEntity, CompanyE
         System.out.println(">> onSkipInRead : "+ t.getMessage());
     }
 
+
     @Override
     public void onSkipInWrite(CompanyEntity item, Throwable t) {
         System.out.println(">> onSkipInWrite : "+ item);
@@ -30,7 +32,7 @@ public class CompanySkipListener implements SkipListener<CompanyEntity, CompanyE
     }
 
     @Override
-    public void onSkipInProcess(CompanyEntity item, Throwable t) {
+    public void onSkipInProcess(CompanyDto item, Throwable t) {
         System.out.println(">> onSkipInProcess : "+ item.getCompanySeq());
         failCompanySet.add(item.getCompanySeq());
         System.out.println(">> onSkipInProcess : "+ t.getMessage());

@@ -7,6 +7,7 @@ import org.springframework.batch.core.JobExecutionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Slf4j
 public class CompanyJobListener implements JobExecutionListener {
@@ -23,7 +24,8 @@ public class CompanyJobListener implements JobExecutionListener {
         long endTime = Objects.requireNonNull(jobExecution.getEndTime()).getTime();
         log.info("***************** Job end *****************");
         log.info("************ Job name : {} **********", jobExecution.getJobInstance().getJobName());
-        log.info("fail company List = {}", jobExecution.getExecutionContext().get("failCompanySet"));
+        log.info("fail company Set = {}", jobExecution.getExecutionContext().get("failCompanySet"));
+        log.info("fail company size = {}", ((Set)jobExecution.getExecutionContext().get("failCompanySet")).size());
         log.info("수행시간 -> {}", (endTime - startTime));
     }
 }

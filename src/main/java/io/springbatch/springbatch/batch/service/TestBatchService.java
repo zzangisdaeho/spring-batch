@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentBatchService {
+public class TestBatchService {
 
     private final CompanyRepository companyRepository;
 
@@ -20,13 +20,13 @@ public class PaymentBatchService {
 
         CompanyEntity companyEntity = companyRepository.findById(companyDto.getCompanySeq()).get();
 
-        if (companyEntity.getCompanySeq() % 4 == 0) {
-            throw new IllegalStateException("4번째 컴페니는 통과할 수 없다!");
+        if (companyEntity.getCompanySeq() % 3 == 0) {
+            throw new IllegalStateException("3번째 컴페니는 통과할 수 없다!");
         }
 
         companyEntity.setUpdateTime(ZonedDateTime.now());
         companyEntity.getMembers().forEach(member -> {
-//            member.setMemberName(member.getMemberName() + "_payment");
+            member.setMemberName(member.getMemberName() + "_test");
             member.setUpdateTime(ZonedDateTime.now());
         });
 

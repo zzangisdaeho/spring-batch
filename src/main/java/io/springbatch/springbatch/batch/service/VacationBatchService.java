@@ -2,6 +2,7 @@ package io.springbatch.springbatch.batch.service;
 
 import io.springbatch.springbatch.api.entity.CompanyEntity;
 import io.springbatch.springbatch.api.repository.CompanyRepository;
+import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,8 +13,12 @@ import java.time.ZonedDateTime;
 @RequiredArgsConstructor
 public class VacationBatchService {
 
-//    @Transactional(transactionManager = "apiTransactionManager")
-    public void update(CompanyEntity companyEntity){
+    private final CompanyRepository companyRepository;
+
+    @Transactional(transactionManager = "apiTransactionManager")
+    public CompanyEntity update(CompanyDto companyDto) {
+
+        CompanyEntity companyEntity = companyRepository.findById(companyDto.getCompanySeq()).get();
 
         if(companyEntity.getCompanySeq() % 5 == 0){
             throw new IllegalStateException("5번째 컴페니는 통과할 수 없다!");
@@ -21,9 +26,11 @@ public class VacationBatchService {
 
         companyEntity.setUpdateTime(ZonedDateTime.now());
         companyEntity.getMembers().forEach(member -> {
-            member.setMemberName(member.getMemberName() + "_vacation");
+//            member.setMemberName(member.getMemberName() + "_vacation");
             member.setUpdateTime(ZonedDateTime.now());
         });
         companyEntity.getMembers().forEach(member -> member.setUpdateTime(ZonedDateTime.now()));
+
+        return companyEntity;
     }
 }

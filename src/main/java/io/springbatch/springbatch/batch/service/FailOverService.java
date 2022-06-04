@@ -12,8 +12,8 @@ public class FailOverService {
     private final CompanyRepository companyRepository;
     private final VacationBatchService testService;
 
-    public void failOver(long companySeq) {
-        testService.update(companyRepository.findById(companySeq).get());
-    }
+//    public void failOver(long companySeq) {
+//        testService.update(companyRepository.findById(companySeq).get());
+//    }
 
 }

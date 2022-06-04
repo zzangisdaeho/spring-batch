@@ -3,6 +3,7 @@ package io.springbatch.springbatch.batch.job.payment;
 import io.springbatch.springbatch.api.entity.CompanyEntity;
 import io.springbatch.springbatch.batch.job.listener.CompanyJobListener;
 import io.springbatch.springbatch.batch.job.listener.CompanySkipListener;
+import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import io.springbatch.springbatch.batch.service.PaymentBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,16 +12,23 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.PagingQueryProvider;
+import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
+import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,26 +37,27 @@ public class PaymentJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private final PlatformTransactionManager apiTransactionManager;
-
-    private final EntityManagerFactory emf;
 
     private final CompanySkipListener skipListener;
 
     private final PaymentBatchService paymentBatchService;
 
+    @Qualifier("apiDataSource")
+    @Autowired
+    private final DataSource apiDataSource;
+
     @Bean
-    public Job paymentJob() {
+    public Job paymentJob() throws Exception {
         return jobBuilderFactory.get("paymentJob")
                 .start(paymentStep())
                 .listener(new CompanyJobListener())
                 .build();
     }
     @Bean
-    public Step paymentStep() {
+    public Step paymentStep() throws Exception {
 
         return stepBuilderFactory.get("paymentStep")
-                .<CompanyEntity, CompanyEntity>chunk(1)
+                .<CompanyDto, CompanyEntity>chunk(1)
                 .reader(paymentReader())
                 .processor(paymentProcessor())
                 .writer(paymentWriter())
@@ -70,25 +79,52 @@ public class PaymentJobConfig {
         return backOffPolicy;
     }
 
-    @Bean
-    public ItemReader<CompanyEntity> paymentReader() {
-        return new JpaPagingItemReaderBuilder<CompanyEntity>()
-                .name("companyReader")
-                .entityManagerFactory(emf)
-                .pageSize(1)
-                .queryString("select c from CompanyEntity c order by c.companySeq")
-                .build();
-    }
+//    @Bean
+//    public ItemReader<CompanyEntity> paymentReader() {
+//        return new JpaPagingItemReaderBuilder<CompanyEntity>()
+//                .name("companyReader")
+//                .entityManagerFactory(emf)
+//                .pageSize(1)
+//                .queryString("select c from CompanyEntity c order by c.companySeq")
+//                .build();
+//    }
+@Bean
+public JdbcPagingItemReader<CompanyDto> paymentReader() throws Exception {
+
+    return new JdbcPagingItemReaderBuilder<CompanyDto>()
+            .name("testItemReader")
+            .pageSize(1)
+            .dataSource(apiDataSource)
+            .rowMapper(new BeanPropertyRowMapper<>(CompanyDto.class))
+            .queryProvider(paymentQueryProvider())
+            .build();
+}
 
     @Bean
-    public ItemProcessor<CompanyEntity, CompanyEntity> paymentProcessor(){
+    public PagingQueryProvider paymentQueryProvider() throws Exception {
+        SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
+        queryProvider.setDataSource(apiDataSource);
+//        queryProvider.setSelectClause("company_seq, company_name");
+//        queryProvider.setFromClause("from company_entity");
+        queryProvider.setSelectClause("companySeq, companyName");
+        queryProvider.setFromClause("from CompanyEntity");
+
+        Map<String, Order> sortKeys = new HashMap<>(1);
+        sortKeys.put("companySeq", Order.ASCENDING);
+
+        queryProvider.setSortKeys(sortKeys);
+
+        return queryProvider.getObject();
+    }
+
+
+    @Bean
+    public ItemProcessor<CompanyDto, CompanyEntity> paymentProcessor(){
         return item -> {
             log.info("company Seq : {}", item.getCompanySeq());
 
 //            Thread.sleep(1000);
-            paymentBatchService.update(item);
-
-            return item;
+            return paymentBatchService.update(item);
         };
     }
 

@@ -1,13 +1,14 @@
-package io.springbatch.springbatch.batch.job.vacation;
+package io.springbatch.springbatch.batch.job.test;
 
 import io.springbatch.springbatch.api.entity.CompanyEntity;
+import io.springbatch.springbatch.batch.job.dto.CompanyDto;
 import io.springbatch.springbatch.batch.job.listener.CompanyJobListener;
 import io.springbatch.springbatch.batch.job.listener.CompanySkipListener;
-import io.springbatch.springbatch.batch.job.dto.CompanyDto;
-import io.springbatch.springbatch.batch.service.VacationBatchService;
+import io.springbatch.springbatch.batch.service.TestBatchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -26,7 +27,6 @@ import org.springframework.dao.TransientDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,34 +34,34 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-public class VacationJobConfig {
+public class TestJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
     private final CompanySkipListener skipListener;
 
-    private final VacationBatchService vacationBatchService;
+    private final TestBatchService testBatchService;
 
     @Qualifier("apiDataSource")
     @Autowired
     private final DataSource apiDataSource;
 
     @Bean
-    public Job vacationJob() throws Exception {
-        return jobBuilderFactory.get("vacationJob")
-                .start(vacationStep())
+    public Job testJob() throws Exception {
+        return jobBuilderFactory.get("testJob")
+                .start(testStep())
                 .listener(new CompanyJobListener())
                 .build();
     }
     @Bean
-    public Step vacationStep() throws Exception {
+    public Step testStep() throws Exception {
 
-        return stepBuilderFactory.get("vacationStep")
+        return stepBuilderFactory.get("testStep")
                 .<CompanyDto, CompanyEntity>chunk(1)
-                .reader(vacationReader())
-                .processor(vacationProcessor())
-                .writer(vacationWriter())
+                .reader(testReader())
+                .processor(testProcessor())
+                .writer(testWriter())
                 .faultTolerant()
                 .retry(TransientDataAccessException.class)
                 .retryLimit(3)
@@ -80,30 +80,20 @@ public class VacationJobConfig {
         return backOffPolicy;
     }
 
-//    @Bean
-//    public ItemReader<CompanyEntity> vacationReader() {
-//        return new JpaPagingItemReaderBuilder<CompanyEntity>()
-//                .name("companyReader")
-//                .entityManagerFactory(emf)
-//                .pageSize(1)
-//                .queryString("select c from CompanyEntity c order by c.companySeq")
-//                .build();
-//    }
-
     @Bean
-    public JdbcPagingItemReader<CompanyDto> vacationReader() throws Exception {
+    public JdbcPagingItemReader<CompanyDto> testReader() throws Exception {
 
         return new JdbcPagingItemReaderBuilder<CompanyDto>()
                 .name("testItemReader")
                 .pageSize(1)
                 .dataSource(apiDataSource)
                 .rowMapper(new BeanPropertyRowMapper<>(CompanyDto.class))
-                .queryProvider(vacationQueryProvider())
+                .queryProvider(testQueryProvider())
                 .build();
     }
 
     @Bean
-    public PagingQueryProvider vacationQueryProvider() throws Exception {
+    public PagingQueryProvider testQueryProvider() throws Exception {
         SqlPagingQueryProviderFactoryBean queryProvider = new SqlPagingQueryProviderFactoryBean();
         queryProvider.setDataSource(apiDataSource);
 //        queryProvider.setSelectClause("company_seq, company_name");
@@ -120,21 +110,20 @@ public class VacationJobConfig {
     }
 
     @Bean
-    public ItemProcessor<CompanyDto, CompanyEntity> vacationProcessor(){
+    public ItemProcessor<CompanyDto, CompanyEntity> testProcessor(){
         return item -> {
-//            Thread.sleep(1000);
             log.info("company Seq : {}", item.getCompanySeq());
-            return vacationBatchService.update(item);
+
+            return testBatchService.update(item);
         };
     }
 
     @Bean
-    public ItemWriter<CompanyEntity> vacationWriter() {
+    public ItemWriter<CompanyEntity> testWriter() {
 
         return items -> {
             log.info("=============================Writer Result========================");
             items.forEach(company -> log.info("{} : {} : {}",company.getCompanySeq(), company.getCompanyName(), company.getUpdateTime()));
-            log.info("=============================Writer Result========================");
         };
     }
 }

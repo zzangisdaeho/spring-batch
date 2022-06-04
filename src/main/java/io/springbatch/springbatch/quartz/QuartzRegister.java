@@ -1,6 +1,7 @@
 package io.springbatch.springbatch.quartz;
 
 import io.springbatch.springbatch.quartz.schedule.PaymentJobSchedule;
+import io.springbatch.springbatch.quartz.schedule.TestScheduleJob;
 import io.springbatch.springbatch.quartz.schedule.VacationJobSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,5 +18,6 @@ public class QuartzRegister {
     public void scheduler() {
         quartzService.addCronJob(VacationJobSchedule.class, "vacationBatch", "docswave_batch", "docswave 휴가 부여 테스트", null, "0 0/1 * 1/1 * ? *");
         quartzService.addCronJob(PaymentJobSchedule.class, "paymentBatch", "docswave_batch", "docswave 결제 테스트", null, "0 0/1 * 1/1 * ? *");
+        quartzService.addCronJob(TestScheduleJob.class, "testJob", "docswave_batch", "testJob", null, "0 0/1 * 1/1 * ? *");
     }
 }

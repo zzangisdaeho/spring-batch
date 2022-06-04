@@ -20,14 +20,24 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class TestScheduleJob extends QuartzJobBean {
 
+    private final JobLauncher jobLauncher;
+
+    private final Job testJob;
 
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
-        Integer testNum = (Integer)context.getJobDetail().getJobDataMap().get("testNum");
+//        Integer testNum = (Integer)context.getJobDetail().getJobDataMap().get("testNum");
+//
+//        log.info("TestScheduleJob.executeInternal" + testNum);
 
-        log.info("TestScheduleJob.executeInternal" + testNum);
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addDate("date", new Date())
+                .toJobParameters();
+        jobLauncher.run(testJob, jobParameters);
+
 
     }
 }
