@@ -10,6 +10,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
@@ -19,6 +20,7 @@ import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuild
 import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
@@ -26,6 +28,9 @@ import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 
 import javax.sql.DataSource;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +63,7 @@ public class TestJobConfig {
         return stepBuilderFactory.get("testStep")
                 .<Long, CompanyEntity>chunk(1)
                 .reader(testReader())
-                .processor(testProcessor())
+                .processor(testProcessor(null))
                 .writer(testWriter())
                 .faultTolerant()
                 .retry(TransientDataAccessException.class)
@@ -108,9 +113,13 @@ public class TestJobConfig {
     }
 
     @Bean
-    public ItemProcessor<Long, CompanyEntity> testProcessor(){
+    @StepScope
+    public ItemProcessor<Long, CompanyEntity> testProcessor(@Value("#{jobParameters[date]}") Date date){
         return item -> {
             log.info("company Seq : {}", item);
+            log.info("job parameter date : {}", date);
+            ZonedDateTime jobExecuteZonedTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC);
+            log.info("job parameter date to convert ZonedDateTime : {}", jobExecuteZonedTime);
 
             return testBatchService.update(item);
         };

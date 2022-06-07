@@ -122,6 +122,7 @@ public JdbcPagingItemReader<Long> paymentReader() throws Exception {
         return item -> {
             log.info("company Seq : {}", item);
 
+
 //            Thread.sleep(1000);
             return paymentBatchService.update(item);
         };
