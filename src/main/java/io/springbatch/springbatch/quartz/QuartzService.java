@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Map;
@@ -16,7 +19,7 @@ import java.util.Map;
 public class QuartzService {
     private final Scheduler scheduler;
 
-    public void addSimpleJob(Class job, String name, String group, String desc, Map params, Integer seconds) {
+    public void addSimpleJob(Class job, String name, String group, String desc, Map params, ZonedDateTime time) {
         JobDetail jobDetail = buildJobDetail(job, name, group, desc, params);
 
         try {
@@ -26,7 +29,7 @@ public class QuartzService {
 
             scheduler.scheduleJob(
                     jobDetail,
-                    buildSimpleJobTrigger(seconds)
+                    buildSimpleJobTrigger(time)
             );
         } catch (SchedulerException e) {
             e.printStackTrace();
@@ -76,13 +79,9 @@ public class QuartzService {
     /**
      * Simple Job Trigger
      */
-    private Trigger buildSimpleJobTrigger(Integer seconds) {
-        return TriggerBuilder.newTrigger()
-                .withSchedule(SimpleScheduleBuilder
-                        .simpleSchedule()
-                        .repeatForever()
-                        .withIntervalInSeconds(seconds))
-                .build();
+    private Trigger buildSimpleJobTrigger(ZonedDateTime time) {
+
+        return TriggerBuilder.newTrigger().startAt(Date.from(time.toInstant())).build();
     }
 
     public static String buildCronExpression(LocalDateTime time) {

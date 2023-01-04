@@ -2,8 +2,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-  batch:
-    job:
-      enabled: false # job 자동실행 막는다. default = true
-      names: ${job.name:NONE} # --job.name=JOBNAME1,JOBNAME2 name=... date= ...
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/quartz?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
